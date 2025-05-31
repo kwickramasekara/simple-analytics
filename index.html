@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics Integration Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        background: #f4f4f4;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      button {
+        background: #007cba;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #005a87;
+      }
+      .download-link {
+        color: #007cba;
+        text-decoration: none;
+      }
+      .download-link:hover {
+        text-decoration: underline;
+      }
+      .debug-info {
+        background: #e8f4fd;
+        padding: 15px;
+        border-left: 4px solid #007cba;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Web Analytics Integration Example</h1>
+
+    <div class="container">
+      <h2>About This Page</h2>
+      <p>
+        This page demonstrates the web analytics tool integration. The analytics
+        script is tracking:
+      </p>
+      <ul>
+        <li>Page views (automatically tracked)</li>
+        <li>Outbound link clicks</li>
+        <li>File downloads</li>
+        <li>Scroll depth</li>
+        <li>Time on page</li>
+        <li>Custom events</li>
+      </ul>
+    </div>
+
+    <div class="container">
+      <h2>Test Analytics Features</h2>
+
+      <h3>Custom Event Tracking</h3>
+      <button onclick="trackButtonClick('signup')">Sign Up Button</button>
+      <button onclick="trackButtonClick('login')">Login Button</button>
+      <button onclick="trackFormSubmission()">Form Submission</button>
+
+      <h3>Outbound Links (will be tracked automatically)</h3>
+      <p>
+        <a href="https://www.google.com" target="_blank">Visit Google</a> |
+        <a href="https://github.com" target="_blank">Visit GitHub</a> |
+        <a href="https://stackoverflow.com" target="_blank"
+          >Visit Stack Overflow</a
+        >
+      </p>
+
+      <h3>File Downloads (will be tracked automatically)</h3>
+      <p>
+        <a href="/sample.pdf" class="download-link">Download PDF Sample</a> |
+        <a href="/document.docx" class="download-link">Download DOCX Sample</a>
+        |
+        <a href="/data.xlsx" class="download-link">Download Excel Sample</a>
+      </p>
+    </div>
+
+    <div class="container">
+      <h2>Scroll Tracking Test</h2>
+      <p>
+        Scroll down this page to test scroll depth tracking. The analytics will
+        track when you reach 25%, 50%, 75%, 90%, and 100% of the page.
+      </p>
+
+      <!-- Add some content to make the page scrollable -->
+      <div
+        style="
+          height: 500px;
+          background: linear-gradient(to bottom, #f0f0f0, #ffffff);
+          padding: 20px;
+        "
+      >
+        <h3>More Content</h3>
+        <p>
+          This section adds height to the page so you can test scroll tracking.
+        </p>
+        <p>Keep scrolling to see the scroll depth events in the console...</p>
+      </div>
+
+      <div
+        style="
+          height: 500px;
+          background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+          padding: 20px;
+        "
+      >
+        <h3>Even More Content</h3>
+        <p>This is additional content to make the page longer.</p>
+        <p>
+          The analytics script will track your scroll progress automatically.
+        </p>
+      </div>
+
+      <div style="height: 300px; background: #f8f8f8; padding: 20px">
+        <h3>Final Section</h3>
+        <p>
+          You've reached the bottom! This should trigger the 100% scroll depth
+          event.
+        </p>
+      </div>
+    </div>
+
+    <div class="debug-info">
+      <h3>🐛 Debug Information</h3>
+      <p>
+        Open your browser's Developer Tools (F12) and check the Console tab to
+        see analytics events being tracked.
+      </p>
+      <p>
+        Make sure to set <code>DEBUG: true</code> in the analytics configuration
+        to see detailed logging.
+      </p>
+    </div>
+
+    <!-- Analytics Script Integration -->
+    <script src="index.js"></script>
+
+    <!-- 
+    IMPORTANT: Include your analytics script here
+    Replace the path with the correct path to your analytics-client.js file
+    -->
+    <!-- <script src="analytics-client.js"></script> -->
+
+    <!-- 
+    Alternative: Inline the script
+    <script>
+        // Paste the entire analytics-client.js content here
+        // Make sure to update the CONFIG.APPWRITE_FUNCTION_URL first
+    </script>
+    -->
+  </body>
+</html>
