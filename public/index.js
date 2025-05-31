@@ -49,7 +49,6 @@
 
       debug('Sending analytics data:', payload);
 
-      console.log(payload);
       const response = await fetch(CONFIG.APPWRITE_FUNCTION_URL, {
         method: 'POST',
         headers: {

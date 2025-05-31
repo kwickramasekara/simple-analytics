@@ -13,6 +13,12 @@ const DATABASE_ID = process.env.APPWRITE_DATABASE_ID ?? '';
 const COLLECTION_ID = process.env.APPWRITE_COLLECTION_ID ?? '';
 const GEOAPIFY_API_KEY = process.env.GEOAPIFY_API_KEY;
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Appwrite-Key',
+};
+
 // Bot detection patterns (based on isbot library patterns)
 const BOT_PATTERNS = [
   /bot/i,
@@ -164,23 +170,16 @@ function parseBrowserInfo(userAgent) {
 
 // Main function handler
 export default async ({ req, res, log, error }) => {
+  if (req.method === 'OPTIONS') {
+    return res.send('', 204, corsHeaders);
+  }
+
+  // Send error if method is not POST
+  if (req.method !== 'POST') {
+    return res.json({ error: 'Method not allowed' }, 405, corsHeaders);
+  }
+
   try {
-    console.log('Received request:', req.method, req.url);
-
-    // Handle CORS preflight requests
-    if (req.method === 'OPTIONS') {
-      return res.send('', 200, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      });
-    }
-
-    // Only allow POST and OPTIONS methods
-    if (req.method !== 'POST') {
-      return res.json({ error: 'Method not allowed' }, 405);
-    }
-
     // Parse request body
     const data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
@@ -272,9 +271,7 @@ export default async ({ req, res, log, error }) => {
         timestamp: documentData.timestamp,
       },
       200,
-      {
-        'Access-Control-Allow-Origin': '*',
-      }
+      corsHeaders
     );
   } catch (err) {
     error('Error processing analytics event:', err);
@@ -284,9 +281,7 @@ export default async ({ req, res, log, error }) => {
         error: err.message,
       },
       500,
-      {
-        'Access-Control-Allow-Origin': '*',
-      }
+      corsHeaders
     );
   }
 };
