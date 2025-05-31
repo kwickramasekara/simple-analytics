@@ -131,3 +131,7 @@ dist
 
 # Directory used by Appwrite CLI for local development
 .appwrite
+
+# Operating system files
+.DS_Store
+Thumbs.db
