@@ -3,7 +3,7 @@
 
   // Configuration - Update these values for your setup
   const CONFIG = {
-    APPWRITE_FUNCTION_URL: 'https://683a538100039ca1b92e.fra.appwrite.run', // Replace with your Appwrite function URL
+    APPWRITE_FUNCTION_URL: 'https://at-test.keithw.me', // Replace with your Appwrite function URL
     TRACK_OUTBOUND_LINKS: true,
     TRACK_FILE_DOWNLOADS: true,
     TRACK_SCROLL_DEPTH: true,
