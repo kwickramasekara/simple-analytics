@@ -47,7 +47,7 @@ analytics.track('button_click', {
 ### 1. Set Up Appwrite
 
 1. Create an Appwrite project
-2. Set up database and collection (see `setup-guide.md`)
+2. Set up database and collection
 3. Generate API keys
 
 ### 2. Get API Keys
@@ -57,14 +57,11 @@ analytics.track('button_click', {
 
 ### 3. Configure & Deploy Function
 
-```bash
-# Update configuration in appwrite-analytics-function.js
-# Deploy using the helper script
-chmod +x deploy.sh
-./deploy.sh
-```
+1. Create a new Appwrite function in the Appwrite console
+2. Use import from Github to import this repository
+3. Set environment variables
 
-### 4. Add to Your Website
+### 3. Add to Your Website
 
 ```html
 <!-- Include the script -->
@@ -145,7 +142,7 @@ Location data is provided by Geoapify's IP Geolocation API:
 
 ```javascript
 const CONFIG = {
-  APPWRITE_FUNCTION_URL: 'your-function-url',
+  APPWRITE_FUNCTION_URL: 'your-appwrite-function-url',
   TRACK_OUTBOUND_LINKS: true,
   TRACK_FILE_DOWNLOADS: true,
   TRACK_SCROLL_DEPTH: true,
@@ -193,34 +190,7 @@ analytics.pageview();
 - Search queries
 - Error tracking
 
-### Data Analysis
-
-The collected data can be used for:
-
-- Traffic analysis and trends
-- User behavior insights
-- Performance monitoring
-- Conversion tracking
-- Geographic analysis
-
-## 🧪 Testing
-
-Use the included `example-integration.html` to test:
-
-1. Open the file in a browser
-2. Enable debug mode in analytics config
-3. Open developer tools console
-4. Interact with the page elements
-5. Verify events are being tracked
-
 ## 🔧 Troubleshooting
-
-### Common Issues
-
-1. **CORS Errors**: Configure Appwrite function domains
-2. **No Data**: Check API keys and database permissions
-3. **Function Timeouts**: Optimize function or increase timeout
-4. **Rate Limits**: Monitor Geoapify usage
 
 ### Debug Mode
 
@@ -230,40 +200,9 @@ Enable debug logging:
 analytics.config.DEBUG = true;
 ```
 
-## 📚 Documentation
-
-- `setup-guide.md`: Detailed setup instructions
-- `example-integration.html`: Working integration example
-- Inline code comments for implementation details
-
-## 🤝 Contributing
-
-This is a simple analytics tool designed for educational and small-scale production use. Feel free to:
-
-- Add new event types
-- Improve bot detection
-- Enhance privacy features
-- Add data visualization
-
-## 📄 License
-
-MIT License - feel free to use and modify for your projects.
-
 ## 🔗 Related Resources
 
 - [Appwrite Functions Documentation](https://appwrite.io/docs/products/functions)
 - [Geoapify IP Geolocation API](https://www.geoapify.com/ip-geolocation-api)
 - [Bot Detection Patterns](https://github.com/omrilotan/isbot)
 - [Web Analytics Best Practices](https://www.google.com/analytics)
-
-## ⚠️ Important Notes
-
-1. **API Limits**: Monitor your Geoapify usage (3,000 free requests/day)
-2. **Privacy Laws**: Ensure compliance with GDPR, CCPA, etc.
-3. **Performance**: The client script is lightweight but test on your site
-4. **Security**: Keep API keys secure and rotate regularly
-5. **Scaling**: Consider upgrading Appwrite and Geoapify plans for high traffic
-
----
-
-Built with ❤️ using Appwrite, Geoapify, and modern web technologies.

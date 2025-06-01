@@ -1,4 +1,4 @@
-import { Client, Databases, ID } from 'node-appwrite';
+import { Client, Databases, ID, Storage } from 'node-appwrite';
 
 // Initialize Appwrite client
 const client = new Client()
@@ -8,15 +8,14 @@ const client = new Client()
 
 const databases = new Databases(client);
 
+const storage = new Storage(client);
+
 // Constants
 const DATABASE_ID = process.env.APPWRITE_DATABASE_ID ?? '';
-const COLLECTION_ID = process.env.APPWRITE_COLLECTION_ID ?? '';
 const GEOAPIFY_API_KEY = process.env.GEOAPIFY_API_KEY;
 
-const corsHeaders = {
+const CORSHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Appwrite-Key',
 };
 
 // Bot detection patterns (based on isbot library patterns)
@@ -62,13 +61,32 @@ function isBot(userAgent) {
 }
 
 // Function to get geolocation data from Geoapify
-async function getLocationData(ip) {
+async function getLocationData(ip, eventType) {
+  console.log(
+    'Fetching geolocation data for IP:',
+    ip,
+    'Event Type:',
+    eventType
+  );
+  const defaultObj = {
+    country: null,
+    region: null,
+    city: null,
+    latitude: null,
+    longitude: null,
+    timezone: null,
+    isp: null,
+  };
+
+  if (eventType !== 'page_view') return defaultObj; // Skip geolocation for non-page view events to reduce API calls
+
   try {
     const response = await fetch(
       `https://api.geoapify.com/v1/ipinfo?ip=${ip}&apiKey=${GEOAPIFY_API_KEY}`
     );
     const data = await response.json();
 
+    console.log('Geolocation data received:', data);
     return {
       country: data.country?.name || null,
       region: data.state?.name || null,
@@ -80,15 +98,7 @@ async function getLocationData(ip) {
     };
   } catch (error) {
     console.error('Geolocation error:', error);
-    return {
-      country: null,
-      region: null,
-      city: null,
-      latitude: null,
-      longitude: null,
-      timezone: null,
-      isp: null,
-    };
+    return defaultObj;
   }
 }
 
@@ -170,26 +180,40 @@ function parseBrowserInfo(userAgent) {
 
 // Main function handler
 export default async ({ req, res, log, error }) => {
+  // Preflight CORS headers
   if (req.method === 'OPTIONS') {
-    return res.send('', 204, corsHeaders);
+    return res.send('', 204, {
+      ...CORSHeaders,
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-Appwrite-Key',
+    });
   }
 
-  // Send error if method is not POST
+  // Send error for unsupported methods
   if (req.method !== 'POST') {
-    return res.json({ error: 'Method not allowed' }, 405, corsHeaders);
+    return res.json({ error: 'Method not allowed' }, 405, CORSHeaders);
   }
 
   try {
     // Parse request body
     const data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
+    if (!data || !data.siteId) {
+      throw new Error('Missing required data');
+    }
+
     // Get client IP address
-    const clientIP =
+    const clientIPs =
       req.headers['x-forwarded-for'] ||
       req.headers['x-real-ip'] ||
       req.headers['cf-connecting-ip'] ||
       req.connection?.remoteAddress ||
-      'unknown';
+      '';
+
+    const clientIP = Array.isArray(clientIPs)
+      ? clientIPs[0]
+      : clientIPs.split(',')[0].trim();
 
     // Get user agent
     const userAgent = req.headers['user-agent'] || '';
@@ -205,7 +229,7 @@ export default async ({ req, res, log, error }) => {
     const isRobot = isBot(userAgent);
 
     // Get location data
-    const locationData = await getLocationData(clientIP);
+    const locationData = await getLocationData(clientIP, data.eventType);
 
     // Prepare document data
     const documentData = {
@@ -247,16 +271,14 @@ export default async ({ req, res, log, error }) => {
       platform: data.platform || null,
 
       // Custom event data
-      eventType: data.eventType || 'pageview',
+      eventType: data.eventType || null,
       eventData: (data.eventData && JSON.stringify(data.eventData)) || null,
     };
-
-    log('Processing analytics event:', JSON.stringify(documentData, null, 2));
 
     // Save to database
     const result = await databases.createDocument(
       DATABASE_ID,
-      COLLECTION_ID,
+      data.siteId,
       ID.unique(),
       documentData
     );
@@ -271,7 +293,7 @@ export default async ({ req, res, log, error }) => {
         timestamp: documentData.timestamp,
       },
       200,
-      corsHeaders
+      CORSHeaders
     );
   } catch (err) {
     error('Error processing analytics event:', err);
@@ -281,7 +303,7 @@ export default async ({ req, res, log, error }) => {
         error: err.message,
       },
       500,
-      corsHeaders
+      CORSHeaders
     );
   }
 };

@@ -1,14 +1,15 @@
 (function () {
   'use strict';
 
-  // Configuration - Update these values for your setup
   const CONFIG = {
-    APPWRITE_FUNCTION_URL: 'https://at-test.keithw.me', // Replace with your Appwrite function URL
+    APPWRITE_FUNCTION_URL: 'https://analytics.keithw.me',
     TRACK_OUTBOUND_LINKS: true,
     TRACK_FILE_DOWNLOADS: true,
     TRACK_SCROLL_DEPTH: true,
     DEBUG: false, // Set to true for debugging
   };
+
+  const script = document.currentScript;
 
   // Debug logging function
   function debug(...args) {
@@ -17,10 +18,10 @@
     }
   }
 
-  // Function to collect browser and system information
   function collectSystemInfo() {
     const nav = navigator;
     const screen = window.screen;
+    const siteId = script && script.dataset && script.dataset.siteId;
 
     return {
       userAgent: nav.userAgent,
@@ -34,10 +35,10 @@
       referrer: document.referrer,
       url: window.location.href,
       title: document.title,
+      siteId: siteId || null,
     };
   }
 
-  // Function to send data to Appwrite function
   async function sendAnalyticsData(eventData) {
     try {
       const systemInfo = collectSystemInfo();
@@ -69,10 +70,9 @@
     }
   }
 
-  // Track page view
   function trackPageView() {
     sendAnalyticsData({
-      eventType: 'pageView',
+      eventType: 'page_view',
       eventData: {
         path: window.location.pathname,
         search: window.location.search,
@@ -81,7 +81,7 @@
     });
   }
 
-  // Track custom events
+  // Custom events
   function trackEvent(eventName, eventData = {}) {
     sendAnalyticsData({
       eventType: 'custom_event',
@@ -92,7 +92,6 @@
     });
   }
 
-  // Track outbound link clicks
   function trackOutboundLinks() {
     if (!CONFIG.TRACK_OUTBOUND_LINKS) return;
 
@@ -122,7 +121,6 @@
     });
   }
 
-  // Track file downloads
   function trackFileDownloads() {
     if (!CONFIG.TRACK_FILE_DOWNLOADS) return;
 
@@ -182,7 +180,6 @@
     });
   }
 
-  // Track scroll depth
   function trackScrollDepth() {
     if (!CONFIG.TRACK_SCROLL_DEPTH) return;
 
@@ -279,8 +276,16 @@
     }, 30000); // Check every 30 seconds
   }
 
-  // Initialize analytics
   function initAnalytics() {
+    const siteId = script && script.dataset && script.dataset.siteId;
+
+    if (!siteId) {
+      console.warn(
+        'No site ID found in script tag. Analytics will not be initialized.'
+      );
+      return;
+    }
+
     debug('Initializing analytics...');
 
     // Track initial page view
@@ -312,15 +317,3 @@
 
   debug('Analytics script loaded');
 })();
-
-// Usage examples:
-//
-// 1. Track custom events:
-// analytics.track('button_click', { button_id: 'signup', section: 'header' });
-// analytics.track('form_submission', { form_name: 'contact', success: true });
-//
-// 2. Manual pageview tracking (for SPAs):
-// analytics.pageview();
-//
-// 3. Configure settings:
-// analytics.config.DEBUG = true;
